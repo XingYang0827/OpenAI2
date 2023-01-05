@@ -57,20 +57,21 @@ class appStore {
 	}
 
 	noCreditsRemainPrompt = () => {
-		// set the browser url to the no-credits page
-		window.location.pathname = "/my-profile"
+		Auth.signOut()
+		this.redirect = '/my-profile'
 	}
-
+	
 	init = async () => {
 		try {
 			this.referralTrackingCode()
-			const profile = localStorage.getItem("profile")
-			const token = localStorage.getItem("token")
-			if (profile && token) {
-				this.api.defaults.headers.common['x-access-token'] = token;
-				this.profile = JSON.parse(profile)
+			const session = await Auth.currentSession()
+			if (session) {
+				this.api.defaults.headers.common['Authorization'] = session.getIdToken().getJwtToken()
+				const idToken = session.getIdToken()
+				const accessToken = session.getAccessToken()
+				this.profile = idToken.payload
 				this.isLoggedIn = true
-				this.refreshTokenAndProfile()
+				this.refreshTokenAndProfile(accessToken)
 			}
 		} catch (err){
 			console.log(err)
@@ -82,22 +83,29 @@ class appStore {
 	referralTrackingCode = async () => {
 		let referral = new URLSearchParams(window.location.search).get("referral")
 		if(referral){
+			await Auth.updateUserAttributes({ referral })
 			this.setReferral(referral)
 		} else {
-			this.initReferral()
+			const userInfo = await Auth.currentUserInfo()
+			if (userInfo && userInfo.attributes && userInfo.attributes.referral) {
+				this.setReferral(userInfo.attributes.referral)
+			} else {
+				this.initReferral()
+			}
 		}
 	}
 
 	setReferral = async (referral) => {
 		this.referral = referral
-		localStorage.setItem("referral", JSON.stringify(referral))
+		await Auth.updateUserAttributes({ referral })
 	}
 	
 	initReferral = async () => {
-		const referral = localStorage.getItem("referral")
-		this.referral = referral
-	}
-
+		const userInfo = await Auth.currentUserInfo()
+		if (userInfo && userInfo.attributes && userInfo.attributes.referral) {
+			this.referral = userInfo.attributes.referral
+		}
+	}	
 	
 	loginWithDataTokenAndProfile = async (data) => {
 		await Auth.signIn(data.profile.email, data.token)
@@ -105,15 +113,13 @@ class appStore {
 		this.isLoggedIn = true
 	}
 
-	refreshTokenAndProfile = async () => {
+	refreshTokenAndProfile = async (accessToken) => {
 		try {
-			let data = await this.api
-				.post('/user/refresh/profile')
-				.then(({ data }) => data)
-			if(data){
-				this.setProfile(data.profile)
-			}
-		} catch (err){
+			await Auth.currentSession()
+			const idToken = session.getIdToken()
+			accessToken = session.getAccessToken()
+			this.setProfile(idToken)
+		} catch (err) {
 			console.log(err)
 		}
 	}
@@ -124,20 +130,19 @@ class appStore {
 		}
 	}
 
-	setToken = (token) => {
-		localStorage.setItem("token", token)
-		this.api.defaults.headers.common['x-access-token'] = token
-	}
-	setProfile = (profile) => {
-		localStorage.setItem("profile", JSON.stringify(profile))
-		this.profile = profile
+	setToken = (accessToken) => {
+		Auth.updateCachedItem({ accessToken })
+		this.api.defaults.headers.common['Authorization'] = accessToken.getJwtToken()
 	}
 
+	setProfile = (idToken) => {
+		this.profile = idToken.payload
+	}
+	
 	handleLogout = () => {
-		localStorage.removeItem("profile");
-		localStorage.removeItem("token");
 		this.profile = {}
 		this.isLoggedIn = false
+		Auth.signOut()
 		this.redirect = `/`
 	}
 
