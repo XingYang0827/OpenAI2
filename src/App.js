@@ -6,7 +6,7 @@ import {
   Redirect,
   Route,
 } from "react-router-dom";
-import { withAuthenticator } from 'aws-amplify-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import Amplify, { Auth, API, Analytics } from 'aws-amplify';
 import { ThemeProvider } from 'styled-components';
 import colors from 'tailwindcss/colors';
