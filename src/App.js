@@ -21,13 +21,7 @@ import LoginSuccess from './Login/Success';
 
 import './App.scss';
 
-Amplify.configure({
-  Auth: {
-    region: 'us-west-1',
-    userPoolId: 'us-west-1_ZFjUDVPik',
-    userPoolWebClientId: '1in1crrn2818ov0c4ncdap8fcj',
-  },
-});
+Amplify.configure(awsconfig);
 
 @withAuthenticator
 class App extends Component {
