@@ -24,33 +24,31 @@ import './App.scss';
 
 Amplify.configure(awsconfig);
 
-@withAuthenticator
-class App extends Component {
-  render() {
-    const user = Auth.currentAuthenticatedUser();
-    return (
-      <ThemeProvider theme={colors}>
-        <Router>
-          {!user ? <Redirect to="/login" /> : null}
-          <Switch>
-            <Route path="/" exact component={Dashboard} />
-            <Route path="/search" exact component={Search} />
-            <Route path="/my-profile" component={Profile} />
-            <Route path="/signup/failed" component={Profile} />
-            <Route path="/signup/success" component={LoginSuccess} />
-            <Route path="/ai/">
-              <Switch>
-                <Route path="/ai/code/debugging" component={Chat} />
-                <Route component={Tool} />
-              </Switch>
-            </Route>
-            <Route path="/login" component={Auth} />
-            <Route component={Header} />
-          </Switch>
-        </Router>
-      </ThemeProvider>
-    );
-  }
-}
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [profile, setProfile] = useState({});
+  const [redirect, setRedirect] = useState('');
+
+  useEffect(() => {
+    const init = async () => {
+      try {
+        const user = await Auth.currentAuthenticatedUser();
+        if (user) {
+          setProfile(user.attributes);
+          setIsLoggedIn(true);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    init();
+  }, []);
+  
+  return (
+    <ThemeProvider theme={colors}>
+
+    </ThemeProvider>
+  );
+};
 
 export default withAuthenticator(App);
