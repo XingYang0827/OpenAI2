@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { AmplifyAuthenticator, AmplifySignUp, AmplifySignIn } from '@aws-amplify/ui-react';
+import { withAuthenticator, AmplifySignUp, AmplifySignIn } from '@aws-amplify/ui-react';
 import { Router, Switch, Redirect, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import { Provider } from 'mobx-react';
@@ -25,7 +25,7 @@ if (!window.store) {
 class App extends Component {
   render() {
     return (
-      <AmplifyAuthenticator>
+      <withAuthenticator>
         <Switch>
           {window.store.isLoggedIn ? (
             <>
@@ -70,7 +70,7 @@ class App extends Component {
             </>
           )}
         </Switch>
-      </AmplifyAuthenticator>
+      </withAuthenticator>
     );
   }
 }
