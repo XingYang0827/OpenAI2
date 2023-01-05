@@ -1,7 +1,7 @@
 import { ThemeProvider } from 'styled-components'
 import React, { Component } from 'react';
 import { observer } from 'mobx-react'
-import { withAuthenticator } from 'aws-amplify-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import { Router, Switch, Redirect, Route } from "react-router-dom";
 import { Provider } from 'mobx-react';
 
