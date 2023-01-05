@@ -1,85 +1,89 @@
-import { Auth } from 'aws-amplify';
-import { withAuthenticator } from '@aws-amplify/ui-react';
-import React, { useState, useEffect } from 'react';
-import { Router, Switch, Redirect, Route } from "react-router-dom";
-import { ThemeProvider } from 'styled-components';
-import colors from 'tailwindcss/colors';
+import { ThemeProvider } from 'styled-components'
+import React, { Component } from 'react';
 
-import Header from './Header';
-import Search from './Search';
-import Dashboard from './Dashboard';
-import Tool from './Core/Tool';
-import Chat from './Core/Chat';
-import Login from './Login/Login';
-import Profile from './Profile/';
-import LoginSuccess from './Login/Success';
+import { Provider  } from 'mobx-react'
+import { observer,  } from 'mobx-react'
 
-import './App.scss';
+import AppStore from './store'
+import colors from 'tailwindcss/colors' 
+import {
+  BrowserRouter as Router,
+  Switch,
+  Redirect,
+  Route,
+} from "react-router-dom";
 
-function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [redirect, setRedirect] = useState(null);
-  const [profile, setProfile] = useState(null);
+import Header from './Header'
+import Search from './Search'
 
-  useEffect(() => {
-    async function checkUser() {
-      try {
-        const user = await Auth.currentAuthenticatedUser();
-        setIsAuthenticated(true);
-        setProfile(user.attributes);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    }
-    checkUser();
-  }, []);
+import Dashboard from './Dashboard'
 
-  return (
-    <ThemeProvider theme={colors}>
-      <Router>
-        {redirect ? <Redirect to={redirect} /> : null }
-        {isAuthenticated ? (
-          <>
-            {profile.status ? (
-              <>
-                <Switch>
-                  <Route path="/writing/document"><div/></Route>
-                  <Route component={Header} />
-                </Switch>
-                <Switch>
-                  <Route path="/" exact component={Dashboard} />
-                  <Route path="/search" exact component={Search} />
-                  <Route path="/ai/">
-                    <Switch>
-                      <Route path="/ai/code/debugging" component={Chat} />
-                      <Route component={Tool} />
-                    </Switch>
-                  </Route>
-                  <Route path="/my-profile" component={Profile} />
-                  <Route path="/signup/failed" component={Profile} />
-                  <Route path="/signup/success" component={LoginSuccess} />
-                  <Route path="/signup/success" component={LoginSuccess} />
-                </Switch>
-              </>
-            ) : (
-              <>
-                {/* Render routes and views for users without a paid plan */}
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            <Switch>
-              <Route path="/" exact>
-                <Redirect to="/login" />
-              </Route>
-              <Route path="/" component={Login} />
-            </Switch>
-          </>
-        )}
-      </Router>
-    </ThemeProvider>
-  );
+import Tool from './Core/Tool'
+import Chat from './Core/Chat'
+
+import Login from './Login/Login'
+
+import Profile from './Profile/'
+import LoginSuccess from './Login/Success'
+
+
+import './App.scss'
+
+if(!window.store){
+  window.store = new AppStore();
 }
 
-export default withAuthenticator(App);
+
+@observer
+class App extends Component {
+  render() {
+    return (
+    <ThemeProvider theme={colors}>
+        <Provider store={window.store}>
+          <Router>
+           {window.store.redirect ? <Redirect to={window.store.redirect} /> : null }
+            {window.store.isLoggedIn ? <>
+            {window.store.profile.status ? <>  {/*  Logged in with plan */}
+                <Switch>
+                    <Route path="/writing/document"><div/></Route>
+                    <Route component={Header} />
+                </Switch>
+               
+                <Switch>
+                      
+                      <Route path="/" exact component={Dashboard} />
+                      <Route path="/search" exact component={Search} />
+
+
+                      <Route path="/ai/" >
+                        <Switch>
+
+                          <Route path="/ai/code/debugging" component={Chat} />
+                          <Route component={Tool} />
+
+                        </Switch>
+                      </Route>
+                      <Route path="/my-profile" component={Profile} />
+                      <Route path="/signup/failed" component={Profile} />
+                      <Route path="/signup/success" component={LoginSuccess} />
+                      <Route path="/signup/success" component={LoginSuccess} />
+                    
+                  </Switch>
+                </> : <> {/* Logged in but no plan */}
+               
+                </>} </> : <> {/*  Not Logged In */}
+                <Switch>
+                  <Route path="/" exact>
+                    <Redirect to="/login" />
+                  </Route>
+                  <Route path="/" component={Login} />
+                </Switch>
+            </>}
+           </Router>
+        </Provider>
+      </ThemeProvider>
+    )
+  }
+}
+
+export default App

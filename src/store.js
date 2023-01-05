@@ -1,19 +1,26 @@
-import { observable, computed, makeObservable } from 'mobx';
-import { Auth } from 'aws-amplify';
-import FuzzySet from 'fuzzyset';
-import Filter from 'bad-words';
-import TOOLS from './tools';
-import config from './config';
+import axios from 'axios'
+import { observable, computed, makeObservable } from 'mobx'
+import { configure } from "mobx"
+import FuzzySet from 'fuzzyset'
+import Filter from 'bad-words'
 
-let filterBadWords = new Filter();
+import TOOLS from './tools'
+import config from './config'
 
-let baseURL = config.baseURL;
 
-makeObservable(this);
+let filterBadWords = new Filter()
 
-const FuzzySearch = FuzzySet([...TOOLS.map((tool) => tool.title)]);
+let baseURL = config.baseURL
+
+configure({  enforceActions: "never", })
+
+let api = axios.create({ baseURL, });
+
+const FuzzySearch = FuzzySet([...TOOLS.map(tool => tool.title)]);
 
 class appStore {
+
+	api = api
 	@observable baseURL = baseURL
 	@observable redirect = ``
 	@observable editor
@@ -230,6 +237,4 @@ class appStore {
 }
 
 
-export default new appStore();
-
-  
+export default appStore
