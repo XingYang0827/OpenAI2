@@ -16,6 +16,8 @@ import LoginSuccess from './Login/Success';
 
 import './App.scss';
 
+Amplify.configure(awsconfig);
+
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [profile, setProfile] = useState({});
