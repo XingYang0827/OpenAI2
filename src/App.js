@@ -1,79 +1,61 @@
-import { ThemeProvider } from 'styled-components'
+
 import React, { Component } from 'react';
-import { Provider  } from 'mobx-react'
-import { observer,  } from 'mobx-react'
-import { withAuthenticator } from '@aws-amplify/ui-react';
-import { Router, Switch, Redirect, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Redirect,
+  Route,
+} from "react-router-dom";
+import { withAuthenticator } from 'aws-amplify-react';
+import Amplify, { Auth, API, Analytics } from 'aws-amplify';
+import { ThemeProvider } from 'styled-components';
+import colors from 'tailwindcss/colors';
 
-import AppStore from './store'
-import colors from 'tailwindcss/colors' 
-import Header from './Header'
-import Search from './Search'
-import Dashboard from './Dashboard'
-import Tool from './Core/Tool'
-import Chat from './Core/Chat'
-import Login from './Login/Login'
-import Profile from './Profile/'
-import LoginSuccess from './Login/Success'
+import Header from './Header';
+import Search from './Search';
+import Dashboard from './Dashboard';
+import Tool from './Core/Tool';
+import Chat from './Core/Chat';
+import Profile from './Profile/';
+import LoginSuccess from './Login/Success';
 
-import './App.scss'
+import './App.scss';
 
+Amplify.configure({
+  Auth: {
+    region: 'us-west-1',
+    userPoolId: 'us-west-1_ZFjUDVPik',
+    userPoolWebClientId: '1in1crrn2818ov0c4ncdap8fcj',
+  },
+});
 
-if(!window.store){
-  window.store = new AppStore();
-}
-
-
-@observer
+@withAuthenticator
 class App extends Component {
   render() {
+    const user = Auth.currentAuthenticatedUser();
     return (
-    <ThemeProvider theme={colors}>
-        <Provider store={window.store}>
-          <Router>
-           {window.store.redirect ? <Redirect to={window.store.redirect} /> : null }
-            {window.store.isLoggedIn ? <>
-            {window.store.profile.status ? <>  {/*  Logged in with plan */}
-                <Switch>
-                    <Route path="/writing/document"><div/></Route>
-                    <Route component={Header} />
-                </Switch>
-               
-                <Switch>
-                      
-                      <Route path="/" exact component={Dashboard} />
-                      <Route path="/search" exact component={Search} />
-
-
-                      <Route path="/ai/" >
-                        <Switch>
-
-                          <Route path="/ai/code/debugging" component={Chat} />
-                          <Route component={Tool} />
-
-                        </Switch>
-                      </Route>
-                      <Route path="/my-profile" component={Profile} />
-                      <Route path="/signup/failed" component={Profile} />
-                      <Route path="/signup/success" component={LoginSuccess} />
-                      <Route path="/signup/success" component={LoginSuccess} />
-                    
-                  </Switch>
-                </> : <> {/* Logged in but no plan */}
-               
-                </>} </> : <> {/*  Not Logged In */}
-                <Switch>
-                  <Route path="/" exact>
-                    <Redirect to="/login" />
-                  </Route>
-                  <Route path="/" component={Login} />
-                </Switch>
-            </>}
-           </Router>
-        </Provider>
+      <ThemeProvider theme={colors}>
+        <Router>
+          {!user ? <Redirect to="/login" /> : null}
+          <Switch>
+            <Route path="/" exact component={Dashboard} />
+            <Route path="/search" exact component={Search} />
+            <Route path="/my-profile" component={Profile} />
+            <Route path="/signup/failed" component={Profile} />
+            <Route path="/signup/success" component={LoginSuccess} />
+            <Route path="/ai/">
+              <Switch>
+                <Route path="/ai/code/debugging" component={Chat} />
+                <Route component={Tool} />
+              </Switch>
+            </Route>
+            <Route path="/login" component={Auth} />
+            <Route component={Header} />
+          </Switch>
+        </Router>
       </ThemeProvider>
-    )
+    );
   }
 }
 
-export default App
+export default withAuthenticator(App);
