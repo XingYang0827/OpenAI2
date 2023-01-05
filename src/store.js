@@ -115,7 +115,7 @@ class appStore {
 
 	refreshTokenAndProfile = async (accessToken) => {
 		try {
-			await Auth.currentSession()
+			const session = await Auth.currentSession()
 			const idToken = session.getIdToken()
 			accessToken = session.getAccessToken()
 			this.setProfile(idToken)
