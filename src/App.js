@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { Router, Switch, Redirect, Route } from "react-router-dom";
 import { Auth } from 'aws-amplify';
 import { ThemeProvider } from 'styled-components';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 
 import Header from './Header';
 import Search from './Search';
 import Dashboard from './Dashboard';
+import colors from 'tailwindcss/colors' 
 import Tool from './Core/Tool';
 import Chat from './Core/Chat';
 import Login from './Login/Login';
