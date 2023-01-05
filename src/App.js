@@ -1,33 +1,22 @@
 import { ThemeProvider } from 'styled-components'
 import React, { Component } from 'react';
-
-import { Provider  } from 'mobx-react'
-import { observer,  } from 'mobx-react'
+import { observer } from 'mobx-react'
+import { withAuthenticator } from 'aws-amplify-react';
+import { Router, Switch, Redirect, Route } from "react-router-dom";
 
 import AppStore from './store'
 import colors from 'tailwindcss/colors' 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Redirect,
-  Route,
-} from "react-router-dom";
-
 import Header from './Header'
 import Search from './Search'
-
 import Dashboard from './Dashboard'
-
 import Tool from './Core/Tool'
 import Chat from './Core/Chat'
-
 import Login from './Login/Login'
-
 import Profile from './Profile/'
 import LoginSuccess from './Login/Success'
 
-
 import './App.scss'
+
 
 if(!window.store){
   window.store = new AppStore();
