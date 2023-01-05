@@ -1,5 +1,5 @@
 import { Auth } from 'aws-amplify';
-import { withAuthenticator } from 'aws-amplify-react';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 import React, { useState, useEffect } from 'react';
 import { Router, Switch, Redirect, Route } from "react-router-dom";
 import { ThemeProvider } from 'styled-components';
