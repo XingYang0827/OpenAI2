@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
-    "@aws-amplify/ui-react": "^4.3.2",
+    "@aws-amplify/ui-react": "^1.2.26",
     "@headlessui/react": "^1.4.1",
     "@heroicons/react": "^1.0.3",
     "@hocuspocus/server": "^1.0.0-alpha.70",
