@@ -1,10 +1,11 @@
-import axios from 'axios';
+
 import { configure } from 'mobx';
 import FuzzySet from 'fuzzyset';
 import Filter from 'bad-words';
 import { Auth } from 'aws-amplify';
 import config from './config';
 import awsconfig from './aws-exports';
+import { withAuthenticator } from '@aws-amplify/ui-react';
 
 Amplify.configure(awsconfig);
 
@@ -13,8 +14,6 @@ let filterBadWords = new Filter();
 let baseURL = config.baseURL;
 
 configure({ enforceActions: 'never' });
-
-let api = axios.create({ baseURL });
 
 const FuzzySearch = FuzzySet([...TOOLS.map((tool) => tool.title)]);
 
