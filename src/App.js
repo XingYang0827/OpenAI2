@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Router, Switch, Redirect, Route } from "react-router-dom";
-import { Auth } from 'aws-amplify';
+import { Auth, Amplify } from 'aws-amplify';
 import { ThemeProvider } from 'styled-components';
 import { withAuthenticator } from '@aws-amplify/ui-react';
 import awsconfig from './aws-exports';
